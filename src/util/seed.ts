@@ -1,20 +1,14 @@
-import * as schema from '../db/schema'
-import 'dotenv/config'
 import { db } from '@app/db/drizzle'
-import { reset, seed } from 'drizzle-seed'
+import { posts, postsRelations, users } from '@app/db/schema'
+import { seed } from 'drizzle-seed'
 
 async function main() {
-	await reset(db, schema)
-
-	await seed(db, schema).refine(() => ({
+	await seed(db, { users, posts, postsRelations }).refine(() => ({
 		users: {
 			count: 100,
 			with: {
 				posts: 10,
 			},
-		},
-		likes: {
-			count: 100,
 		},
 	}))
 }

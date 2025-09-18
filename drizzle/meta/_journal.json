@@ -36,6 +36,13 @@
       "when": 1758166651112,
       "tag": "0004_nappy_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1758219312123,
+      "tag": "0005_nervous_zuras",
+      "breakpoints": true
     }
   ]
 }

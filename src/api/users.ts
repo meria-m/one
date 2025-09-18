@@ -5,21 +5,18 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
 export const fetchAllUsers = createServerFn({ method: 'GET' }).handler(() =>
-	db.query.users.findMany({
-		columns: {
-			id: true,
-			username: true,
-		},
-	}),
+	db.query.users.findMany(),
 )
 
 export const fetchUserById = createServerFn({ method: 'GET' })
 	.validator((id: string) => id)
-	.handler(({ data }) =>
-		db.query.users.findFirst({
+	.handler(async ({ data }) => {
+		const result = await db.query.users.findFirst({
 			where: eq(users.id, data),
-		}),
-	)
+		})
+
+		return result || null
+	})
 
 export const fetchSession = createServerFn({ method: 'GET' }).handler(
 	async () => {
@@ -35,8 +32,10 @@ export const fetchSession = createServerFn({ method: 'GET' }).handler(
 
 export const fetchUserByUsername = createServerFn({ method: 'GET' })
 	.validator((username: string) => username)
-	.handler(({ data }) =>
-		db.query.users.findFirst({
+	.handler(async ({ data }) => {
+		const result = await db.query.users.findFirst({
 			where: eq(users.username, data),
-		}),
-	)
+		})
+
+		return result || null
+	})

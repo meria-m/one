@@ -5,22 +5,25 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/users/@me')({
 	component: RouteComponent,
 	loader: async ({ context }) => {
-		if (!context.user) throw new Error('not logged in')
-
-		const { userId } = context.user
+		if (!context.user) return null
 
 		const me = await context.queryClient.ensureQueryData(
-			userByIdOptions(userId),
+			userByIdOptions(context.user.userId),
 		)
 
-		return { me: me! }
-	},
+		if (!me) throw new Error('could not load me??? THIS IS A BUG!')
 
-	errorComponent: () => <NotFound message="not logged in" />,
+		return me
+	},
+	errorComponent: ({ error }) => <NotFound message={error.message} />,
 })
 
 function RouteComponent() {
-	const { me } = Route.useLoaderData()
+	const me = Route.useLoaderData()
+
+	if (!me) {
+		return <p>not logged in</p>
+	}
 
 	return <div>hello {me.username}!</div>
 }

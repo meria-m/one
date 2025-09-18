@@ -1,10 +1,5 @@
-import {
-	getNewFeed,
-	getPopularFeed,
-	getPostById,
-	getUserProfileFeed,
-} from '@api/posts'
-import { queryOptions } from '@tanstack/react-query'
+import { getNewFeed, getPopularFeed, getPostById, likePost } from '@api/posts'
+import { mutationOptions, queryOptions } from '@tanstack/react-query'
 
 export const newFeedOptions = () =>
 	queryOptions({
@@ -21,15 +16,11 @@ export const popularFeedOptions = () =>
 export const postByIdOptions = (id: string) =>
 	queryOptions({
 		queryKey: ['posts', { id }],
-		queryFn: async () => {
-			const post = await getPostById({ data: id })
-
-			return post || null
-		},
+		queryFn: () => getPostById({ data: id }),
 	})
 
-export const userPostsById = (id: string) =>
-	queryOptions({
-		queryKey: ['users', { id }, 'feed'],
-		queryFn: () => getUserProfileFeed({ data: id }),
+export const likePostMutation = (id: string) =>
+	mutationOptions({
+		mutationKey: ['posts', { id }, 'like'],
+		mutationFn: () => likePost({ data: id }),
 	})

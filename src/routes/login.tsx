@@ -1,6 +1,6 @@
 import { loginMutationOptions } from '@app/options/auth'
-import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/login')({
@@ -8,36 +8,32 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
-	const navigate = useNavigate()
-	const { mutateAsync, error } = useMutation(loginMutationOptions())
+	const { mutateAsync } = useMutation(loginMutationOptions())
+	const queryClient = useQueryClient()
 
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
+	const onClick = () => {
+		mutateAsync({ data: { username, password } }).then(() => {
+			queryClient.invalidateQueries({ queryKey: ['posts', 'feed'] })
+		})
+	}
+
 	// todo: use forms
 	return (
 		<div>
-			{error?.message}
 			<input
 				value={username}
 				onChange={(e) => setUsername(e.target.value)}
 				name="username"
 			/>
-
 			<input
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				name="password"
 			/>
-
-			<button
-				type="button"
-				onClick={() => {
-					mutateAsync({ data: { username, password } }).then(() => {
-						navigate({ to: '/users/@me' })
-					})
-				}}
-			>
+			<button type="button" onClick={onClick}>
 				login
 			</button>
 		</div>

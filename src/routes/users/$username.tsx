@@ -1,7 +1,7 @@
 import { Feed } from '@app/components/Feed'
 import { NotFound } from '@app/components/NotFound'
-import { userPostsById } from '@app/options/posts'
-import { userByUsernameOptions } from '@app/options/users'
+import { useMe } from '@app/hooks/useMe'
+import { userByUsernameOptions, userPostsByIdOptions } from '@app/options/users'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { Suspense } from 'react'
@@ -21,23 +21,26 @@ export const Route = createFileRoute('/users/$username')({
 })
 
 function UserProfileFeed({ userId }) {
-	const { data: posts } = useSuspenseQuery(userPostsById(userId))
+	const { data: posts } = useSuspenseQuery(userPostsByIdOptions(userId))
+
 	return <Feed posts={posts} />
 }
 
 function RouteComponent() {
-	const navigate = useNavigate()
 	const { user } = Route.useLoaderData()
+	const me = useMe()
+	const navigate = useNavigate()
+	const myProfile = user.id === me?.id
 
 	return (
 		<div>
 			<button type="button" onClick={() => navigate({ to: '/home' })}>
 				back
 			</button>
-			<p>
+			<p className={myProfile ? 'text-amber-600' : 'text-black'}>
 				id: {user.id} username: {user.username}
 			</p>
-			<Suspense fallback={'loading'}>
+			<Suspense fallback={'loading...'}>
 				<UserProfileFeed userId={user.id} />
 			</Suspense>
 		</div>
