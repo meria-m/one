@@ -43,6 +43,13 @@
       "when": 1758219312123,
       "tag": "0005_nervous_zuras",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758230316854,
+      "tag": "0006_right_genesis",
+      "breakpoints": true
     }
   ]
 }
