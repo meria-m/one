@@ -1,5 +1,6 @@
 import { db } from '@app/db/drizzle'
 import { users } from '@app/db/schema'
+import { useAppSession } from '@app/hooks/useAppSession'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 
@@ -9,13 +10,6 @@ export const fetchAllUsers = createServerFn({ method: 'GET' }).handler(() =>
 			id: true,
 			username: true,
 		},
-		with: {
-			posts: {
-				columns: {
-					id: true,
-				},
-			},
-		},
 	}),
 )
 
@@ -23,22 +17,26 @@ export const fetchUserById = createServerFn({ method: 'GET' })
 	.validator((id: string) => id)
 	.handler(({ data }) =>
 		db.query.users.findFirst({
-			columns: {
-				id: true,
-				username: true,
-			},
 			where: eq(users.id, data),
 		}),
 	)
+
+export const fetchSession = createServerFn({ method: 'GET' }).handler(
+	async () => {
+		const session = await useAppSession()
+
+		if (!session.data.userId) {
+			return null
+		}
+
+		return { userId: session.data.userId }
+	},
+)
 
 export const fetchUserByUsername = createServerFn({ method: 'GET' })
 	.validator((username: string) => username)
 	.handler(({ data }) =>
 		db.query.users.findFirst({
-			columns: {
-				id: true,
-				username: true,
-			},
 			where: eq(users.username, data),
 		}),
 	)

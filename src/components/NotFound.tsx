@@ -1,12 +1,12 @@
 import { useNavigate } from '@tanstack/react-router'
-import type { FC } from 'react'
 
-interface NotFoundProps {
-	error?: any
+// biome-ignore lint/suspicious/noExplicitAny: this is ok
+interface NotFoundProps<E extends Error = any> {
+	error?: E
 	message: string
 }
 
-export const NotFound: FC<NotFoundProps> = ({ message }) => {
+export function NotFound({ message }: NotFoundProps) {
 	const navigate = useNavigate()
 
 	return (

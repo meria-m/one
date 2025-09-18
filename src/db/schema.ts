@@ -8,10 +8,15 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core'
 
+export const auth = pgTable('auth', {
+	id: cuid2('id').primaryKey(),
+	passwordHash: varchar().notNull(),
+})
+
 export const users = pgTable('users', {
 	id: cuid2('id').defaultRandom().primaryKey(),
 	username: varchar({ length: 255 }).notNull().unique(),
-	passwordHash: varchar().notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
 })
 
 export const posts = pgTable('posts', {
@@ -33,7 +38,11 @@ export const likes = pgTable(
 	(table) => [primaryKey({ columns: [table.postId, table.userId] })],
 )
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
+	auth: one(auth, {
+		fields: [users.id],
+		references: [auth.id],
+	}),
 	posts: many(posts),
 }))
 

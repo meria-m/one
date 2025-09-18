@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 
+import { fetchSession } from '@app/api/users'
 import type { QueryClient } from '@tanstack/react-query'
 import {
 	createRootRouteWithContext,
@@ -8,26 +9,34 @@ import {
 	Scripts,
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import tailwindcss from '../index.css?url'
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
-	{
-		head: () => ({
-			meta: [
-				{
-					charSet: 'utf-8',
-				},
-				{
-					name: 'viewport',
-					content: 'width=device-width, initial-scale=1',
-				},
-				{
-					title: 'One of One',
-				},
-			],
-		}),
-		component: RootComponent,
+interface RouterContext {
+	queryClient: QueryClient
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+	head: () => ({
+		links: [{ rel: 'stylesheet', href: tailwindcss }],
+		meta: [
+			{
+				charSet: 'utf-8',
+			},
+			{
+				name: 'viewport',
+				content: 'width=device-width, initial-scale=1',
+			},
+			{
+				title: 'One of One',
+			},
+		],
+	}),
+	component: RootComponent,
+	beforeLoad: async () => {
+		const user = await fetchSession()
+		return { user }
 	},
-)
+})
 
 function RootComponent() {
 	return (

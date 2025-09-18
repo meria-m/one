@@ -9,13 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LogoutRouteImport } from './routes/logout'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as CountRouteImport } from './routes/count'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UsersAllRouteImport } from './routes/users/all'
+import { Route as UsersAtmeRouteImport } from './routes/users/@me'
 import { Route as UsersUsernameRouteImport } from './routes/users/$username'
 import { Route as PostsIdRouteImport } from './routes/posts.$id'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogoutRoute = LogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -36,6 +55,11 @@ const UsersAllRoute = UsersAllRouteImport.update({
   path: '/users/all',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsersAtmeRoute = UsersAtmeRouteImport.update({
+  id: '/users/@me',
+  path: '/users/@me',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UsersUsernameRoute = UsersUsernameRouteImport.update({
   id: '/users/$username',
   path: '/users/$username',
@@ -51,16 +75,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/count': typeof CountRoute
   '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
   '/posts/$id': typeof PostsIdRoute
   '/users/$username': typeof UsersUsernameRoute
+  '/users/@me': typeof UsersAtmeRoute
   '/users/all': typeof UsersAllRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/count': typeof CountRoute
   '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
   '/posts/$id': typeof PostsIdRoute
   '/users/$username': typeof UsersUsernameRoute
+  '/users/@me': typeof UsersAtmeRoute
   '/users/all': typeof UsersAllRoute
 }
 export interface FileRoutesById {
@@ -68,8 +100,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/count': typeof CountRoute
   '/home': typeof HomeRoute
+  '/login': typeof LoginRoute
+  '/logout': typeof LogoutRoute
+  '/register': typeof RegisterRoute
   '/posts/$id': typeof PostsIdRoute
   '/users/$username': typeof UsersUsernameRoute
+  '/users/@me': typeof UsersAtmeRoute
   '/users/all': typeof UsersAllRoute
 }
 export interface FileRouteTypes {
@@ -78,24 +114,36 @@ export interface FileRouteTypes {
     | '/'
     | '/count'
     | '/home'
+    | '/login'
+    | '/logout'
+    | '/register'
     | '/posts/$id'
     | '/users/$username'
+    | '/users/@me'
     | '/users/all'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/count'
     | '/home'
+    | '/login'
+    | '/logout'
+    | '/register'
     | '/posts/$id'
     | '/users/$username'
+    | '/users/@me'
     | '/users/all'
   id:
     | '__root__'
     | '/'
     | '/count'
     | '/home'
+    | '/login'
+    | '/logout'
+    | '/register'
     | '/posts/$id'
     | '/users/$username'
+    | '/users/@me'
     | '/users/all'
   fileRoutesById: FileRoutesById
 }
@@ -103,13 +151,38 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CountRoute: typeof CountRoute
   HomeRoute: typeof HomeRoute
+  LoginRoute: typeof LoginRoute
+  LogoutRoute: typeof LogoutRoute
+  RegisterRoute: typeof RegisterRoute
   PostsIdRoute: typeof PostsIdRoute
   UsersUsernameRoute: typeof UsersUsernameRoute
+  UsersAtmeRoute: typeof UsersAtmeRoute
   UsersAllRoute: typeof UsersAllRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/home': {
       id: '/home'
       path: '/home'
@@ -138,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersAllRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/users/@me': {
+      id: '/users/@me'
+      path: '/users/@me'
+      fullPath: '/users/@me'
+      preLoaderRoute: typeof UsersAtmeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/users/$username': {
       id: '/users/$username'
       path: '/users/$username'
@@ -159,8 +239,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CountRoute: CountRoute,
   HomeRoute: HomeRoute,
+  LoginRoute: LoginRoute,
+  LogoutRoute: LogoutRoute,
+  RegisterRoute: RegisterRoute,
   PostsIdRoute: PostsIdRoute,
   UsersUsernameRoute: UsersUsernameRoute,
+  UsersAtmeRoute: UsersAtmeRoute,
   UsersAllRoute: UsersAllRoute,
 }
 export const routeTree = rootRouteImport

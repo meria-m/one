@@ -1,4 +1,4 @@
-import { Post } from '@app/components/Post'
+import { Feed } from '@app/components/Feed'
 import { newFeedOptions } from '@app/options/posts'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -10,20 +10,16 @@ export const Route = createFileRoute('/home')({
 
 function NewFeed() {
 	const { data: posts } = useSuspenseQuery(newFeedOptions())
-
-	return (
-		<>
-			{posts.map((post) => {
-				return <Post key={post.id} post={post} />
-			})}
-		</>
-	)
+	return <Feed posts={posts} />
 }
 
 function RouteComponent() {
 	return (
-		<Suspense fallback="loading...">
-			<NewFeed />
-		</Suspense>
+		<div>
+			<p>welcome to ur mom</p>
+			<Suspense fallback="loading...">
+				<NewFeed />
+			</Suspense>
+		</div>
 	)
 }

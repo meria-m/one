@@ -8,10 +8,7 @@ const basePostsQuery = () => {
 	return db
 		.select({
 			...rest,
-			author: {
-				id: users.id,
-				username: users.username,
-			},
+			author: users,
 			likes: count(likes.postId),
 		})
 		.from(posts)

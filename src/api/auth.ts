@@ -1,6 +1,7 @@
 import { db } from '@app/db/drizzle'
-import { users } from '@app/db/schema'
-import { createServerFn } from '@tanstack/react-start'
+import { auth, users } from '@app/db/schema'
+import { useAppSession } from '@app/hooks/useAppSession'
+import { createMiddleware, createServerFn } from '@tanstack/react-start'
 import * as argon2 from 'argon2'
 import { eq } from 'drizzle-orm'
 
@@ -19,17 +20,30 @@ export const register = createServerFn({ method: 'POST' })
 		password,
 	}))
 	.handler(async ({ data: { username, password } }) => {
-		const passwordHash = await argon2.hash(password)
-		const result = await db
-			.insert(users)
-			.values({ username, passwordHash })
-			.returning()
+		const userId = await db
+			.transaction(async (tx) => {
+				const results = await tx
+					.insert(users)
+					.values({ username })
+					.onConflictDoNothing()
+					.returning()
 
-		if (result.length < 1) {
-			throw new Error('username taken')
-		}
+				if (!results.length) {
+					throw new Error('username already exists')
+				}
 
-		return login({ data: { username, password } })
+				const user = results[0]
+
+				const passwordHash = await argon2.hash(password)
+
+				await tx.insert(auth).values({ id: user.id, passwordHash }).returning()
+
+				return user.id
+			})
+			.catch(() => null)
+
+		const session = await useAppSession()
+		if (userId) await session.update({ userId })
 	})
 
 export const login = createServerFn({ method: 'POST' })
@@ -37,16 +51,47 @@ export const login = createServerFn({ method: 'POST' })
 	.handler(async ({ data }) => {
 		const { username, password } = data
 		const user = await db.query.users.findFirst({
+			columns: {
+				id: true,
+			},
 			where: eq(users.username, username),
+			with: {
+				auth: {
+					columns: {
+						passwordHash: true,
+					},
+				},
+			},
 		})
 
 		if (!user) {
 			throw new Error('user not found')
 		}
 
-		const matches = await argon2.verify(user.passwordHash, password)
+		const matches = await argon2.verify(user.auth.passwordHash, password)
 
 		if (!matches) {
 			throw new Error('invalid login')
 		}
+
+		const session = await useAppSession()
+		await session.update({ userId: user.id })
+	})
+
+export const isAuthedMiddleware = createMiddleware({ type: 'function' }).server(
+	async ({ next }) => {
+		const session = await useAppSession()
+
+		if (!session.data.userId) throw new Error('unauthorized')
+
+		return next({ context: { session } })
+	},
+)
+
+export const logout = createServerFn({ method: 'POST' })
+	.middleware([isAuthedMiddleware])
+	.handler(async ({ context }) => {
+		const session = context.session
+
+		await session.clear()
 	})
