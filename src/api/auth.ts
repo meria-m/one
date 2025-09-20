@@ -51,7 +51,6 @@ export const login = createServerFn({ method: 'POST' })
 	.validator(({ username, password }: LoginInput) => ({ username, password }))
 	.handler(async ({ data }) => {
 		const { username, password } = data
-		const session = await useAppSession()
 		const user = await db.query.users.findFirst({
 			where: eq(users.username, username),
 			columns: {
@@ -76,6 +75,7 @@ export const login = createServerFn({ method: 'POST' })
 			throw new Error('invalid login')
 		}
 
+		const session = await useAppSession()
 		await session.update({ userId: user.id })
 
 		throw redirect({ to: '/home' })

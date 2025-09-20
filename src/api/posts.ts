@@ -73,7 +73,7 @@ export const likePost = createServerFn({ method: 'POST' })
         )
 
         INSERT INTO likes (user_id, post_id)
-        SELECT ${userId}, ${postId}
+        SELECT ${users.id}, ${posts.id}
         WHERE NOT EXISTS (SELECT 1 FROM deleted)
         RETURNING post_id AS postId, 'liked' AS action
 
